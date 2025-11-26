@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useDocuments, useQueryDocuments } from '../hooks/useGraphQL'
+import { useDocuments, useQueryDocuments } from '../hooks/useGraphQL.js'
 import { MessageSquare, Send, Shield, Clock, FileText, AlertCircle } from 'lucide-react'
 
 export default function Query() {

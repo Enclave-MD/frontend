@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { documentAPI } from '../utils/api'
-import { useDocuments } from '../hooks/useGraphQL'
+import { documentAPI } from '../utils/api.js'
+import { useDocuments } from '../hooks/useGraphQL.js'
 import { Upload, FileText, Download, Trash2, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import axios from 'axios'
 

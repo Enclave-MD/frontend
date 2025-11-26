@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { teeAPI } from '../utils/api'
+import { teeAPI } from '../utils/api.js'
 import { Shield, Eye, EyeOff } from 'lucide-react'
 
 export default function PIIDemo() {
@@ -13,6 +13,17 @@ export default function PIIDemo() {
       setResult(response.data)
     } catch (error) {
       console.error('Error:', error)
+      // Show user-friendly error message
+      if (error.response) {
+        // Server responded with error status
+        alert(`Error: ${error.response.status} - ${error.response.data?.detail || error.response.statusText}`)
+      } else if (error.request) {
+        // Request was made but no response received
+        alert('Network Error: Unable to reach the server. Please check if the services are running.')
+      } else {
+        // Something else happened
+        alert(`Error: ${error.message}`)
+      }
     } finally {
       setLoading(false)
     }
