@@ -9,6 +9,7 @@ import Query from './pages/Query.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import PIIDemo from './pages/PIIDemo.jsx'
 import { AuthProvider, useAuth } from './utils/AuthContext.jsx'
+import { PrivacyProvider } from './utils/PrivacyContext.jsx'
 import { apolloClient } from './services/graphql.js'
 
 // Protected Route Component
@@ -35,27 +36,29 @@ function App() {
     <ApolloProvider client={apolloClient}>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Dashboard />} />
-              <Route path="documents" element={<Documents />} />
-              <Route path="query" element={<Query />} />
-              <Route path="admin" element={<AdminDashboard />} />
-              <Route path="pii-demo" element={<PIIDemo />} />
-            </Route>
-            
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <PrivacyProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* Protected Routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Dashboard />} />
+                <Route path="documents" element={<Documents />} />
+                <Route path="query" element={<Query />} />
+                <Route path="admin" element={<AdminDashboard />} />
+                <Route path="pii-demo" element={<PIIDemo />} />
+              </Route>
+              
+              {/* Catch all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </PrivacyProvider>
         </AuthProvider>
       </BrowserRouter>
     </ApolloProvider>

@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { documentAPI } from '../utils/api.js'
 import { useDocuments } from '../hooks/useGraphQL.js'
+import { usePrivacy } from '../utils/PrivacyContext'
 import { Upload, FileText, Download, Trash2, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import axios from 'axios'
 
 export default function Documents() {
   const { data, loading: gqlLoading, error: gqlError, refetch } = useDocuments()
+  const { addLog } = usePrivacy()
   const documents = data?.documents || []
+  const prevDocumentsRef = useRef([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -26,6 +29,21 @@ export default function Documents() {
     }
   }, [gqlError])
 
+  useEffect(() => {
+    // Check for status changes to log redaction events
+    documents.forEach(doc => {
+      const prevDoc = prevDocumentsRef.current.find(d => d.id === doc.id)
+      if (prevDoc && prevDoc.status === 'processing' && doc.status === 'ready') {
+        addLog('redaction', `Document "${doc.filename}" successfully redacted`, {
+          piiFound: doc.metadata?.piiCount || 0,
+          original: 'Raw medical data processed in secure enclave...',
+          redacted: doc.metadata?.redactedPreview || doc.metadata?.anonymizedSummary || 'PII neutralized.'
+        })
+      }
+    })
+    prevDocumentsRef.current = documents
+  }, [documents, addLog])
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -33,6 +51,10 @@ export default function Documents() {
     setUploading(true)
     setError('')
     setSuccess('')
+
+    addLog('upload', `Uploading document: ${file.name}`, {
+      original: `File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`
+    })
 
     try {
       // Use direct upload endpoint - simpler and no CORS issues

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useDocuments, useQueryDocuments } from '../hooks/useGraphQL.js'
+import { usePrivacy } from '../utils/PrivacyContext'
 import { MessageSquare, Send, Shield, Clock, FileText, AlertCircle } from 'lucide-react'
 
 export default function Query() {
   const { data: documentsData, loading: documentsLoading, error: documentsError, refetch: refetchDocuments } = useDocuments()
   const [queryDocuments] = useQueryDocuments()
+  const { addLog } = usePrivacy()
   
   const documents = documentsData?.documents?.filter(d => d.status === 'ready') || []
   const [question, setQuestion] = useState('')
@@ -39,6 +41,11 @@ export default function Query() {
       
       const queryResult = result.data?.queryDocuments
       if (queryResult) {
+        addLog('query', 'AI Query processed with redaction', {
+          original: question,
+          redacted: queryResult.redactedQuery,
+          piiFound: queryResult.piiCount || 0
+        })
         setAnswer(queryResult)
         setHistory([{ question, answer: queryResult, timestamp: new Date() }, ...history])
         setQuestion('')
