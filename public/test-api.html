@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>API Test - Direct Check</h1>
+    <button onclick="testAPI()">Test Documents API</button>
+    <pre id="output"></pre>
+    
+    <script>
+        async function testAPI() {
+            const output = document.getElementById('output');
+            output.textContent = 'Testing...\n';
+            
+            try {
+                // Login first
+                output.textContent += 'Logging in...\n';
+                const loginResp = await axios.post('/api/auth/login', {
+                    email: 'testuser@example.com',
+                    password: 'testpass123'
+                });
+                
+                const token = loginResp.data.token;
+                output.textContent += '✓ Login successful!\n';
+                output.textContent += 'Token: ' + token.substring(0, 30) + '...\n\n';
+                
+                // Test documents endpoint WITHOUT trailing slash
+                output.textContent += 'Testing GET /api/documents (no trailing slash)...\n';
+                const docsResp = await axios.get('/api/documents', {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                
+                output.textContent += '✓ Success! Status: ' + docsResp.status + '\n';
+                output.textContent += '✓ Got ' + docsResp.data.length + ' documents\n';
+                output.textContent += JSON.stringify(docsResp.data, null, 2);
+                
+            } catch (error) {
+                output.textContent += '✗ Error: ' + error.message + '\n';
+                if (error.response) {
+                    output.textContent += 'Status: ' + error.response.status + '\n';
+                    output.textContent += 'Data: ' + JSON.stringify(error.response.data, null, 2);
+                }
+                console.error('Full error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { healthAPI } from '../utils/api'
+import { healthAPI } from '../utils/api.js'
 import { Activity, Server, Database, Shield, CheckCircle, XCircle } from 'lucide-react'
 
 export default function AdminDashboard() {

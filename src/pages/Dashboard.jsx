@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FileText, MessageSquare, Shield, Activity, TrendingUp, Clock } from 'lucide-react'
-import { useDashboardData } from '../hooks/useGraphQL'
+import { useDashboardData } from '../hooks/useGraphQL.js'
 
 export default function Dashboard() {
   const { data, loading, error } = useDashboardData()
@@ -15,11 +15,31 @@ export default function Dashboard() {
 
   if (error) {
     console.error('GraphQL Error:', error)
+    console.error('Error details:', {
+      message: error.message,
+      graphQLErrors: error.graphQLErrors,
+      networkError: error.networkError,
+      extraInfo: error.extraInfo
+    })
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-red-600 mb-2">Error loading dashboard data</p>
-          <p className="text-sm text-gray-600">{error.message}</p>
+        <div className="text-center max-w-md">
+          <p className="text-red-600 mb-2 font-semibold">Error loading dashboard data</p>
+          <p className="text-sm text-gray-600 mb-4">{error.message}</p>
+          {error.networkError && (
+            <div className="text-xs text-gray-500 bg-gray-100 p-3 rounded">
+              <p><strong>Network Error:</strong> {error.networkError.message || 'Unable to connect to server'}</p>
+              <p className="mt-2">Make sure the backend services are running.</p>
+            </div>
+          )}
+          {error.graphQLErrors && error.graphQLErrors.length > 0 && (
+            <div className="text-xs text-gray-500 bg-gray-100 p-3 rounded mt-2">
+              <p><strong>GraphQL Errors:</strong></p>
+              {error.graphQLErrors.map((err, i) => (
+                <p key={i}>- {err.message}</p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     )

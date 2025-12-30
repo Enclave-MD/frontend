@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../utils/AuthContext'
+import { useAuth } from '../utils/AuthContext.jsx'
 import { Shield, LogIn, AlertCircle } from 'lucide-react'
 
 export default function Login() {

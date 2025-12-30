@@ -1,18 +1,38 @@
 import { useState } from 'react'
-import { teeAPI } from '../utils/api'
+import { teeAPI } from '../utils/api.js'
+import { usePrivacy } from '../utils/PrivacyContext'
 import { Shield, Eye, EyeOff } from 'lucide-react'
 
 export default function PIIDemo() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
+  const { addLog } = usePrivacy()
 
   const loadDemo = async () => {
     setLoading(true)
     try {
       const response = await teeAPI.piiTest()
-      setResult(response.data)
+      const data = response.data
+      setResult(data)
+      
+      addLog('redaction', 'PII Detection Demo executed', {
+        original: data.original,
+        redacted: data.redacted,
+        piiFound: data.entities?.length || 0
+      })
     } catch (error) {
       console.error('Error:', error)
+      // Show user-friendly error message
+      if (error.response) {
+        // Server responded with error status
+        alert(`Error: ${error.response.status} - ${error.response.data?.detail || error.response.statusText}`)
+      } else if (error.request) {
+        // Request was made but no response received
+        alert('Network Error: Unable to reach the server. Please check if the services are running.')
+      } else {
+        // Something else happened
+        alert(`Error: ${error.message}`)
+      }
     } finally {
       setLoading(false)
     }
