@@ -32,6 +32,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: true,
+        timeout: 90000, // 90 second timeout for AI operations
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('GraphQL proxy error', err);
